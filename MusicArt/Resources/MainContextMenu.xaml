@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:viewModels="clr-namespace:MusicArt.ViewModels"
+                    mc:Ignorable="d">
+    <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
+    <ContextMenu x:Key="MainContextMeny"
+                 d:DataContext="{d:DesignInstance Type=viewModels:iTunesViewModel, IsDesignTimeCreatable=True}">
+        <MenuItem Header="Pre_vious"
+                  Icon="{DynamicResource PreviousImage}"
+                  IsEnabled="{Binding IsPreviousEnabled}"
+                  Command="{Binding PreviousTrackCommand}" />
+        <MenuItem Header="_Play"
+                  InputGestureText="Space"
+                  Icon="{DynamicResource PlayImage}"
+                  Command="{Binding PlayPauseCommand}"
+                  Visibility="{Binding IsPlayEnabled, Converter={StaticResource booleanToVisibilityConverter}}" />
+        <MenuItem Header="_Pause"
+                  InputGestureText="Space"
+                  Icon="{DynamicResource PauseImage}"
+                  Command="{Binding PlayPauseCommand}"
+                  Visibility="{Binding IsPauseEnabled, Converter={StaticResource booleanToVisibilityConverter}}" />
+        <MenuItem Header="_Next"
+                  Icon="{DynamicResource NextImage}"
+                  IsEnabled="{Binding IsNextEnabled}"
+                  Command="{Binding NextTrackCommand}" />
+        <Separator />
+        <MenuItem Header="Show in _iTunes"
+                  InputGestureText="O"
+                  Command="{Binding ShowItunesCommand}"
+                  Icon="{DynamicResource AppleImage}" />
+        <MenuItem Header="Show in Windows _Explorer"
+                  InputGestureText="F"
+                  Command="{Binding OpenTrackFolderCommand}"
+                  Icon="{DynamicResource FileExplorerImage}" />
+    </ContextMenu>
+
+
+
+</ResourceDictionary>
