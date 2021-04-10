@@ -25,6 +25,7 @@ namespace MusicArt.Views
             UpdateTaskbarThumbnail();
             if (My.Settings.LeftColumnWidth == -1) My.Settings.LeftColumnWidth = LeftColumn.ActualWidth;
             LeftColumn.Width = My.Settings.IsLeftColumnCollapsed ? (new(0)) : (new(My.Settings.LeftColumnWidth));
+            UpdateLeftColumnProps();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -47,9 +48,9 @@ namespace MusicArt.Views
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
 
-        private void RestoreButton_Click(object sender, RoutedEventArgs e) => PerformRestore();
+        private void RestoreButton_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
 
-        private void PerformRestore()
+        private void ToggleFullscreen()
         {
             if (SystemParameters.WorkArea.Height != SystemParameters.PrimaryScreenHeight)
             {
@@ -58,13 +59,15 @@ namespace MusicArt.Views
                 {
                     Height = SystemParameters.PrimaryScreenHeight;
                     Top = 0;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("RestoreDown");
+                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("ExitFullscreen");
+                    RestoreButton.ToolTip = "Exit Fullscreen";
                 }
                 else
                 {
                     Height = SystemParameters.WorkArea.Height;
                     Top = SystemParameters.WorkArea.Top;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("RestoreUp");
+                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("Fullscreen");
+                    RestoreButton.ToolTip = "Fullscreen";
                 }
             }
             else
@@ -74,13 +77,15 @@ namespace MusicArt.Views
                 {
                     Width = SystemParameters.PrimaryScreenWidth;
                     Left = 0;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("RestoreDown");
+                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("ExitFullscreen");
+                    RestoreButton.ToolTip = "Exit Fullscreen";
                 }
                 else
                 {
                     Width = SystemParameters.WorkArea.Width;
                     Left = SystemParameters.WorkArea.Left;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("RestoreUp");
+                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("Fullscreen");
+                    RestoreButton.ToolTip = "Fullscreen";
                 }
             }
         }
@@ -106,7 +111,21 @@ namespace MusicArt.Views
             switch (e.Key)
             {
                 case Key.Escape:
-                    PerformRestore();
+                    ToggleFullscreen();
+                    break;
+                case Key.C:
+                case Key.R:
+                    DoubleAnimationUsingKeyFrames flashAnimation = new()
+                    {
+                        KeyFrames = new()
+                        {
+                            new LinearDoubleKeyFrame(0.2, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.1))),
+                            new LinearDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.1)))
+                        }
+                    };
+                    flashAnimation.Completed += (object sender, EventArgs e) => OverlayGrid.Visibility = Visibility.Hidden;
+                    OverlayGrid.Visibility = Visibility.Visible;
+                    OverlayGrid.BeginAnimation(OpacityProperty, flashAnimation);
                     break;
                 case Key.I:
                     TrackInfoGrid.BeginAnimation(OpacityProperty, new DoubleAnimation(0, TimeSpan.FromSeconds(0.2)));

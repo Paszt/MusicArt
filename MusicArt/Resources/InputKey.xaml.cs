@@ -10,14 +10,8 @@ namespace MusicArt.Resources
     {
         public InputKey() => InitializeComponent();
 
-        public static readonly DependencyProperty TextProperty =
-        DependencyProperty.Register
-        (
-            "Text",
-            typeof(string),
-            typeof(InputKey),
-            new FrameworkPropertyMetadata("Esc")
-        );
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register
+            ("Text", typeof(string), typeof(InputKey), new FrameworkPropertyMetadata("Esc"));
 
         public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
     }

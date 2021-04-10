@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
 
@@ -68,9 +68,9 @@ namespace MusicArt.ViewModels
             updateProgressTimer?.Dispose();
             iApp.OnPlayerPlayEvent -= iApp_PlayerPlaying;
             iApp.OnPlayerStopEvent -= iApp_PlayerStopped;
-            iApp.OnPlayerPlayingTrackChangedEvent += IApp_PlayingTrackInfoChanged;
+            iApp.OnPlayerPlayingTrackChangedEvent -= iApp_PlayingTrackInfoChanged;
             iApp.OnQuittingEvent -= iApp_iTunesQuitting;
-            iApp.OnAboutToPromptUserToQuitEvent -= IApp_AboutToPromptUserToQuit;
+            iApp.OnAboutToPromptUserToQuitEvent -= iApp_AboutToPromptUserToQuit;
             iApp.OnSoundVolumeChangedEvent -= iApp_SoundVolumeChanged;
             System.Runtime.InteropServices.Marshal.FinalReleaseComObject(iApp);
             iApp = null;
@@ -81,9 +81,9 @@ namespace MusicArt.ViewModels
             IsItunesClosed = true;
         }
 
-        private void IApp_AboutToPromptUserToQuit() => DisconnectFromItunes();
+        private void iApp_AboutToPromptUserToQuit() => DisconnectFromItunes();
 
-        private void IApp_PlayingTrackInfoChanged(object iTrack) => UpdateTrackAndPlayerState();
+        private void iApp_PlayingTrackInfoChanged(object iTrack) => UpdateTrackAndPlayerState();
 
         private void iApp_PlayerPlaying(object iTrack) => UpdateTrackAndPlayerState();
 
@@ -91,7 +91,9 @@ namespace MusicArt.ViewModels
 
         private void UpdateTrackAndPlayerState()
         {
-            if (iApp.CurrentTrack != null) Track = new(iApp.CurrentTrack);
+            Track = iApp.CurrentTrack != null 
+                ? new(iApp.CurrentTrack) 
+                : new((ImageSource)Application.Current.FindResource("Cassette"));
             GetPlayerButtonsState(out bool previousEnabled, out _, out bool nextEnabled);
             IsPreviousEnabled = previousEnabled;
             IsNextEnabled = nextEnabled;
@@ -106,7 +108,7 @@ namespace MusicArt.ViewModels
             NotifyPropertyChanged(nameof(TrackDoesntHaveLyrics));
         }
 
-        private void iApp_iTunesQuitting() { }
+        private void iApp_iTunesQuitting() => DisconnectFromItunes();
         private void iApp_SoundVolumeChanged(int newVolume) { }
 
         private void ConnectToItunes()
@@ -116,7 +118,7 @@ namespace MusicArt.ViewModels
             iApp.OnPlayerPlayEvent += iApp_PlayerPlaying;
             iApp.OnPlayerStopEvent += iApp_PlayerStopped;
             iApp.OnQuittingEvent += iApp_iTunesQuitting;
-            iApp.OnAboutToPromptUserToQuitEvent += IApp_AboutToPromptUserToQuit;
+            iApp.OnAboutToPromptUserToQuitEvent += iApp_AboutToPromptUserToQuit;
             iApp.OnSoundVolumeChangedEvent += iApp_SoundVolumeChanged;
             UpdateTrackAndPlayerState();
             updateProgressTimer = new((e) => UpdateProgress(), null, TimeSpan.Zero, TimeSpan.FromSeconds(0.5));
@@ -124,7 +126,7 @@ namespace MusicArt.ViewModels
 
         private void UpdateProgress()
         {
-            if (iApp.CurrentTrack == null || Track == null) ProgressState = TaskbarItemProgressState.None;
+            if (iApp.CurrentTrack == null || Track == null || Track.Duration == 0) ProgressState = TaskbarItemProgressState.None;
             else
             {
                 ProgressValue = (double)(iApp.PlayerPosition / (decimal)Track.Duration);

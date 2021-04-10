@@ -6,7 +6,7 @@
                     mc:Ignorable="d">
     <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
     <ContextMenu x:Key="MainContextMeny"
-                 d:DataContext="{d:DesignInstance Type=viewModels:iTunesViewModel, IsDesignTimeCreatable=True}">
+                 d:DataContext="{d:DesignInstance Type=viewModels:iTunesViewModel}">
         <MenuItem Header="Pre_vious"
                   Icon="{DynamicResource PreviousImage}"
                   IsEnabled="{Binding IsPreviousEnabled}"
@@ -35,7 +35,5 @@
                   Command="{Binding OpenTrackFolderCommand}"
                   Icon="{DynamicResource FileExplorerImage}" />
     </ContextMenu>
-
-
 
 </ResourceDictionary>

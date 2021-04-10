@@ -66,6 +66,7 @@
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
     <Grid>
+
         <!--Main Grid with Covert Art and Track Info-->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -99,30 +100,36 @@
                            Grid.Row="1" />
 
                 <!--Info Tab Control-->
-                <TabControl Grid.Row="2"
+                <!--<TabControl Grid.Row="2"
                             Margin="0,12,0,0">
-                    <!--Lyrics-->
+                    -->
+                <!--Lyrics-->
+                <!--
                     <TabItem ToolTip="Lyrics">
                         <TabItem.Header>
                             <Image Source="{DynamicResource Genius}"
                                    Width="20" />
                         </TabItem.Header>
-                        <Grid>
-                            <!--Lyrics-->
-                            <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                          Margin="0,10,0,0"
-                                          Visibility="{Binding TrackHasLyrics, 
-                                                   Converter={StaticResource booleanToVisibilityConverter}}">
-                                <TextBlock Text="{Binding Track.Lyrics }"
-                                           TextWrapping="WrapWithOverflow"
-                                           TextAlignment="Center"
-                                           Margin="0,0,32,0" />
-                            </ScrollViewer>
-                            <!--Lyrics Search-->
+                        <Grid>-->
+                <!--Lyrics-->
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Margin="0,10,0,0"
+                              Grid.Row="2"
+                              Visibility="{Binding TrackHasLyrics, 
+                                                   Converter={StaticResource booleanToVisibilityConverter}}"
+                              d:Visibility="Visible">
+                    <TextBlock Text="{Binding Track.Lyrics }"
+                               TextWrapping="WrapWithOverflow"
+                               TextAlignment="Center"
+                               Margin="0,0,32,0" />
+                </ScrollViewer>
+                <!--Lyrics Search-->
 
-                        </Grid>
+                <!--</Grid>
                     </TabItem>
-                    <!--Band Member Info-->
+                    -->
+                <!--Band Member Info-->
+                <!--
                     <TabItem ToolTip="Credits"
                              Visibility="Collapsed">
                         <TabItem.Header>
@@ -131,7 +138,7 @@
                         </TabItem.Header>
 
                     </TabItem>
-                </TabControl>
+                </TabControl>-->
 
 
             </Grid>
@@ -174,8 +181,7 @@
             <!--Track Info Over Cover Art-->
             <Grid x:Name="TrackInfoGrid"
                   Grid.Column="1"
-                  Margin="30"
-                  VerticalAlignment="Top"
+                  VerticalAlignment="Center"
                   Opacity="0"
                   d:Opacity=".7">
                 <Grid.RowDefinitions>
@@ -188,12 +194,13 @@
                 <TextBlock Text="{Binding Track.Title}"
                            FontWeight="Bold"
                            TextAlignment="Center"
-                           FontSize="18"
-                           Margin="0,8,0,3" />
-                <TextBlock TextAlignment="Center"
+                           FontSize="26"
+                           Margin="0,30,0,3" />
+                <TextBlock Text="{Binding Track.ArtistAlbum}"
+                           TextAlignment="Center"
+                           FontSize="20"
                            TextWrapping="WrapWithOverflow"
-                           Text="{Binding Track.ArtistAlbum}"
-                           Margin="0,3,0,8"
+                           Margin="0,3,0,30"
                            Grid.Row="1" />
             </Grid>
             <!--Left column Control Button-->
@@ -255,6 +262,7 @@
                 </Image>
             </Button>
         </Grid>
+
         <!--Not Connected-->
         <Grid Background="#010101"
               Visibility="{Binding IsItunesClosed, Converter={StaticResource booleanToVisibilityConverter}}"
@@ -272,6 +280,7 @@
                         Command="{Binding StartItunesCommand}" />
             </StackPanel>
         </Grid>
+
         <!--Keyboard Shortcut Guide-->
         <Grid x:Name="ShortcutGuideGrid"
               Opacity="0"
@@ -363,6 +372,15 @@
                            Grid.Row="8" />
             </Grid>
         </Grid>
+
+        <!--Overlay-->
+        <Grid x:Name="OverlayGrid"
+              Background="White"
+              Opacity="0"
+              d:Opacity="0"
+              Visibility="Hidden"
+              d:Visibility="Hidden" />
+
         <!--Control Buttons, Top Right-->
         <Rectangle Fill="Transparent"
                    Height="60"
@@ -415,24 +433,27 @@
             <Button x:Name="MinimizeButton"
                     Background="Transparent"
                     BorderBrush="Transparent"
+                    Template="{DynamicResource MinMaxWindowButton}"
                     Width="40"
                     Focusable="False"
                     VerticalContentAlignment="Bottom"
                     Click="MinimizeButton_Click">
                 <Rectangle Width="12"
                            VerticalAlignment="Center"
-                           Margin="1 1 0 10"
+                           Margin="1 1 0 0"
                            Stroke="{StaticResource ControlGlythColor}"
                            StrokeThickness="2" />
             </Button>
             <Button x:Name="RestoreButton"
                     Background="Transparent"
                     BorderBrush="Transparent"
+                    Template="{DynamicResource MinMaxWindowButton}"
                     Width="40"
                     Focusable="False"
-                    Click="RestoreButton_Click">
+                    Click="RestoreButton_Click"
+                    ToolTip="Fullscreen">
                 <Image x:Name="RestoreImage"
-                       Source="{DynamicResource RestoreUp}"
+                       Source="{DynamicResource Fullscreen}"
                        Margin="4" />
                 <!--<Grid Width="12"
                       Height="12">
@@ -468,5 +489,6 @@
                 </Grid>
             </Button>
         </StackPanel>
+
     </Grid>
 </Window>

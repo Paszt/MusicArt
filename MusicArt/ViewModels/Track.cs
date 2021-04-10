@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -22,6 +23,12 @@ namespace MusicArt.ViewModels
                 SetCoverArt(t);
                 Lyrics = t.Lyrics;
             }
+        }
+
+        public Track(ImageSource coverArt)
+        {
+            CoverArtImageSource = coverArt;
+            CoverArtMaxWidth = 400;
         }
 
         public string Title { get; set; }
@@ -54,15 +61,33 @@ namespace MusicArt.ViewModels
             {
                 try
                 {
-                    track.Artwork[1].SaveArtworkToFile(coverPath);
-                    coverPath = Path.Combine(Path.GetTempPath(), "MusicArt.img");
+                    TagLib.File tagLibFile = TagLib.File.Create(track.Location);
+                    TagLib.IPicture firstPicture = tagLibFile.Tag.Pictures.FirstOrDefault();
+                    if (firstPicture != null)
+                    {
+                        CoverArtImageSource = (ImageSource)new ImageSourceConverter().ConvertFrom(firstPicture.Data.Data);
+                        CoverArtMaxWidth = (int)CoverArtImageSource.Width;
+                        return;
+                    }
                 }
                 catch (Exception) { }
+
+                //try
+                //{
+                //    track.Artwork[1].SaveArtworkToFile(coverPath);
+                //    coverPath = Path.Combine(Path.GetTempPath(), "MusicArt.img");
+                //}
+                //catch (Exception) { }
             }
             if (coverPath != null)
             {
                 CoverArtImageSource = ImageSourceFromPath(coverPath);
                 CoverArtMaxWidth = (int)CoverArtImageSource.Width;
+            }
+            else
+            {
+                CoverArtImageSource = (ImageSource)Application.Current.FindResource("Notes");
+                CoverArtMaxWidth = 200;
             }
         }
 

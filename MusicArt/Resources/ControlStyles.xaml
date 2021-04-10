@@ -511,6 +511,63 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
+    
+    <ControlTemplate x:Key="MinMaxWindowButton"
+                     TargetType="{x:Type Button}">
+        <Border x:Name="border"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                Background="{TemplateBinding Background}"
+                SnapsToDevicePixels="true"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <ContentPresenter x:Name="contentPresenter"
+                              Focusable="False"
+                              Margin="{TemplateBinding Padding}"
+                              RecognizesAccessKey="True"
+                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsDefaulted"
+                     Value="true">
+                <Setter Property="BorderBrush"
+                        TargetName="border"
+                        Value="{StaticResource ControlMouseOverBorderBrush}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver"
+                     Value="true">
+                <Setter Property="Background"
+                        TargetName="border"
+                        Value="{StaticResource ControlMouseOverBackground}" />
+                <Setter Property="BorderBrush"
+                        TargetName="border"
+                        Value="{StaticResource ControlMouseOverBackground}" />
+            </Trigger>
+            <Trigger Property="IsPressed"
+                     Value="true">
+                <Setter Property="Background"
+                        TargetName="border"
+                        Value="{StaticResource ControlBrightDefaultBackground}" />
+                <Setter Property="BorderBrush"
+                        TargetName="border"
+                        Value="{StaticResource ControlBrightDefaultBackground}" />
+            </Trigger>
+            <Trigger Property="IsEnabled"
+                     Value="false">
+                <Setter Property="Background"
+                        TargetName="border"
+                        Value="{StaticResource ControlBrightDefaultBackground}" />
+                <Setter Property="BorderBrush"
+                        TargetName="border"
+                        Value="{StaticResource ControlBrightDefaultBorderBrush}" />
+                <Setter Property="TextElement.Foreground"
+                        TargetName="contentPresenter"
+                        Value="{StaticResource ControlDisabledGlythColor}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
 
 </ResourceDictionary>

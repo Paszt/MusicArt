@@ -4,11 +4,14 @@ using System.Windows.Media.Animation;
 
 namespace MusicArt.Resources
 {
+    /// <summary>
+    /// Very simple Grid Length animation implementation that only handles To type animations, 
+    /// the Pixel GridUnitType, and no easing functions.
+    /// </summary>
     internal class GridLengthAnimation : AnimationTimeline
     {
         /// <summary>
-        /// Static ctor for GridLengthAnimation establishes
-        /// dependency properties, using as much shared data as possible.
+        /// Static ctor for GridLengthAnimation registers dependency properties.
         /// </summary>
         static GridLengthAnimation() =>
             ToProperty = DependencyProperty.Register("To", typeof(GridLength), typeof(GridLengthAnimation));
