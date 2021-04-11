@@ -98,6 +98,9 @@ namespace MusicArt.Views
                     TrackInfoGrid.BeginAnimation(OpacityProperty,
                         new DoubleAnimation(0.7, TimeSpan.FromSeconds(0.2)));
                     break;
+                case Key.M:
+                    WindowState = WindowState.Minimized;
+                    break;
                 case Key.OemQuestion:
                     ShortcutGuideGrid.Visibility = Visibility.Visible;
                     ShortcutGuideGrid.BeginAnimation(OpacityProperty,

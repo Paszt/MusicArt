@@ -317,7 +317,9 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
+
                 <resources:InputKey />
                 <TextBlock Text="Toggle Fullscreen"
                            Grid.Column="1" />
@@ -370,6 +372,12 @@
                 <TextBlock Text="Hold to show this keyboard shortcut guide"
                            Grid.Column="1"
                            Grid.Row="8" />
+
+                <resources:InputKey Text="M"
+                                    Grid.Row="9" />
+                <TextBlock Text="Minimize Window"
+                           Grid.Column="1"
+                           Grid.Row="9" />
             </Grid>
         </Grid>
 
