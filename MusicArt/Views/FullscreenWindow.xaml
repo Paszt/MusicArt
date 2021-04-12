@@ -408,7 +408,7 @@
                 </EventTrigger>
                 <EventTrigger RoutedEvent="Rectangle.MouseLeave">
                     <BeginStoryboard>
-                        <Storyboard>
+                        <Storyboard x:Name="ControlButtonFadeOutStoryboard">
                             <DoubleAnimation Duration="0:0:0.2"
                                              To="0"
                                              Storyboard.TargetName="ControlButtonContainer"

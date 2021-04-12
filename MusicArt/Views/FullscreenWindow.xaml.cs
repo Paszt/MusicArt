@@ -46,7 +46,11 @@ namespace MusicArt.Views
             }
         }
 
-        private void MinimizeButton_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+            ControlButtonFadeOutStoryboard.Begin();
+        }
 
         private void RestoreButton_Click(object sender, RoutedEventArgs e) => ToggleFullscreen();
 
