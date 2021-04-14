@@ -18,7 +18,7 @@
         FontFamily="{DynamicResource SFPro}"
         KeyUp="Window_KeyUp"
         KeyDown="Window_KeyDown"
-        ContextMenu="{StaticResource MainContextMeny}">
+        ContextMenu="{StaticResource MainContextMenu}">
     <Window.DataContext>
         <viewModels:iTunesViewModel />
     </Window.DataContext>
@@ -27,8 +27,8 @@
                     Command="{Binding CopyArtistAlbumCommand}" />
         <KeyBinding Key="Space"
                     Command="{Binding PlayPauseCommand}" />
-        <KeyBinding Gesture="Ctrl+F"
-                    Command="{Binding}" />
+        <!--<KeyBinding Gesture="Ctrl+F"
+                    Command="{Binding}" />-->
         <KeyBinding Key="O"
                     Command="{Binding ShowItunesCommand}" />
         <KeyBinding Key="F"
@@ -171,12 +171,13 @@
             </GridSplitter>
             <!--Cover Art-->
             <Grid x:Name="CoverArtContainer"
-                  Grid.Column="1"
-                  SizeChanged="CoverArtImage_SizeChanged">
+                  Grid.Column="1">
                 <Image x:Name="CoverArtImage"
                        Margin="30"
+                       Width="{Binding Track.CoverArtWidth}"
                        MaxWidth="{Binding Track.CoverArtMaxWidth}"
-                       Source="{Binding Track.CoverArtImageSource}" />
+                       Source="{Binding Track.CoverArtImageSource}"
+                       SizeChanged="CoverArtImage_SizeChanged" />
             </Grid>
             <!--Track Info Over Cover Art-->
             <Grid x:Name="TrackInfoGrid"

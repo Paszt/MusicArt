@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace MusicArt.ViewModels
 {
-    public class ViewModelBase : INotifyPropertyChanged
+    public abstract class BindableModelBase : INotifyPropertyChanged
     {
         /// <summary>
         /// Property changed event for observer pattern.

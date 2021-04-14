@@ -5,7 +5,7 @@
                     xmlns:viewModels="clr-namespace:MusicArt.ViewModels"
                     mc:Ignorable="d">
     <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
-    <ContextMenu x:Key="MainContextMeny"
+    <ContextMenu x:Key="MainContextMenu"
                  d:DataContext="{d:DesignInstance Type=viewModels:iTunesViewModel}">
         <MenuItem Header="Pre_vious"
                   Icon="{DynamicResource PreviousImage}"

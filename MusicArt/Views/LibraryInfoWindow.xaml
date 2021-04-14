@@ -1,0 +1,96 @@
+﻿<Window x:Class="MusicArt.Views.LibraryInfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:MusicArt.Views"
+        xmlns:viewModels="clr-namespace:MusicArt.ViewModels"
+        mc:Ignorable="d"
+        Title="iTunes Library Reports"
+        Height="450"
+        MinHeight="450"
+        Width="300"
+        MinWidth="600"
+        Background="{DynamicResource Background}"
+        Closing="Window_Closing">
+    <!--<Window.DataContext>
+        <viewModels:LibraryInfoViewModel />
+    </Window.DataContext>-->
+    <Window.Resources>
+        <viewModels:DeadTracksViewModel x:Key="DeadTracksViewModel" />
+        <viewModels:NoArtTracksViewModel x:Key="NoArtTracksViewModel" />
+    </Window.Resources>
+    <Grid>
+        <TabControl>
+            <TabItem Header="No Art Tracks">
+                <views:TracksView x:Name="NoArtTracksView"
+                                  DataContext="{StaticResource NoArtTracksViewModel}"
+                                  ShowNoArtTrackImage="True">
+                    <views:TracksView.StartContent>
+                        <StackPanel MaxWidth="460">
+                            <Image Source="{DynamicResource Image}"
+                                   Width="80"
+                                   Margin="0,0,0,20" />
+                            <TextBlock Text="For this report, &quot;No art&quot; is defined as no image file in the same folder as the music file."
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                            <TextBlock Text="The image file could be of type png or jpg and named either the same as the music file, &quot;folder&quot;, or &quot;cover&quot;."
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                            <TextBlock Text="The search will stop after 200 tracks have been found."
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                            <TextBlock Text="Press the Find button below to search your iTunes library for tracks with no art."
+                                       Margin="0,18,0,20"
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                        </StackPanel>
+                    </views:TracksView.StartContent>
+                    <views:TracksView.NoTracksFoundContent>
+                        <StackPanel>
+                            <TextBlock Text="0"
+                                       FontSize="100"
+                                       FontFamily="Consolas"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="No tracks with no art were found."
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </views:TracksView.NoTracksFoundContent>
+                </views:TracksView>
+            </TabItem>
+            <TabItem Header="Dead Tracks">
+                <views:TracksView x:Name="DeadTracksView"
+                                  DataContext="{StaticResource DeadTracksViewModel}"
+                                  ShowDeadTrackImage="True">
+                    <views:TracksView.StartContent>
+                        <StackPanel MaxWidth="460">
+                            <Image Source="{DynamicResource CircleExDrawingImage}"
+                                   Width="80"
+                                   Margin="0,0,0,20" />
+                            <TextBlock Text="This report will search your iTunes library for tracks where the file has been edited, deleted, modified or moved from its previously known location."
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                            <TextBlock Text="In the resulting list - if tracks are found - you can double click on a track to reveal it in iTunes."
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                            <TextBlock Text="Press the Find button below to begin."
+                                       Margin="0,18,0,20"
+                                       TextWrapping="WrapWithOverflow"
+                                       LineHeight="24" />
+                        </StackPanel>
+                    </views:TracksView.StartContent>
+                    <views:TracksView.NoTracksFoundContent>
+                        <StackPanel>
+                            <TextBlock Text="0"
+                                       FontSize="100"
+                                       FontFamily="Consolas"
+                                       HorizontalAlignment="Center" />
+                            <TextBlock Text="No dead tracks were found."
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </views:TracksView.NoTracksFoundContent>
+                </views:TracksView>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

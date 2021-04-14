@@ -1,7 +1,6 @@
 ﻿using iTunesLib;
 using MusicArt.Commands;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
@@ -13,9 +12,9 @@ namespace MusicArt.ViewModels
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles",
         Justification = "That's how it's spelled.")]
-    public class iTunesViewModel : ViewModelBase
+    public class iTunesViewModel : BindableModelBase
     {
-        private iTunesApp iApp;
+        //private iTunesApp iApp;
         private bool isItunesClosed = true;
         private bool isNextEnabled;
         private bool isPauseEnabled;
@@ -30,7 +29,7 @@ namespace MusicArt.ViewModels
 
         public iTunesViewModel()
         {
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            if (App.GetIsInDesignMode())
             {
                 Track = new()
                 {
@@ -59,26 +58,15 @@ namespace MusicArt.ViewModels
         public Thickness ThumbnailClipMargin { get => thumbnailClipMargin; set => SetProperty(ref thumbnailClipMargin, value); }
 
 
-        public void GetPlayerButtonsState(out bool previousEnabled, out ITPlayButtonState playPauseStopState, out bool nextEnabled) =>
-            iApp.GetPlayerButtonsState(out previousEnabled, out playPauseStopState, out nextEnabled);
-
-        public void DisconnectFromItunes()
+        public static void GetPlayerButtonsState(out bool previousEnabled,
+                                                 out ITPlayButtonState playPauseStopState,
+                                                 out bool nextEnabled)
         {
-            updateProgressTimer.Change(Timeout.Infinite, Timeout.Infinite);
-            updateProgressTimer?.Dispose();
-            iApp.OnPlayerPlayEvent -= iApp_PlayerPlaying;
-            iApp.OnPlayerStopEvent -= iApp_PlayerStopped;
-            iApp.OnPlayerPlayingTrackChangedEvent -= iApp_PlayingTrackInfoChanged;
-            iApp.OnQuittingEvent -= iApp_iTunesQuitting;
-            iApp.OnAboutToPromptUserToQuitEvent -= iApp_AboutToPromptUserToQuit;
-            iApp.OnSoundVolumeChangedEvent -= iApp_SoundVolumeChanged;
-            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(iApp);
-            iApp = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            IsItunesClosed = true;
+            // The out parameters must be assigned to before control leaves the current method.
+            // Since a null conditional operator is used, the out parameters are set initial values.
+            previousEnabled = nextEnabled = false;
+            playPauseStopState = default;
+            App.Current?.iApp?.GetPlayerButtonsState(out previousEnabled, out playPauseStopState, out nextEnabled);
         }
 
         private void iApp_AboutToPromptUserToQuit() => DisconnectFromItunes();
@@ -91,13 +79,13 @@ namespace MusicArt.ViewModels
 
         private void UpdateTrackAndPlayerState()
         {
-            Track = iApp.CurrentTrack != null 
-                ? new(iApp.CurrentTrack) 
-                : new((ImageSource)Application.Current.FindResource("Cassette"));
+            Track = App.Current.iApp.CurrentTrack != null
+                ? new(App.Current.iApp.CurrentTrack)
+                : new((ImageSource)Application.Current.FindResource("Cassette"), 300);
             GetPlayerButtonsState(out bool previousEnabled, out _, out bool nextEnabled);
             IsPreviousEnabled = previousEnabled;
             IsNextEnabled = nextEnabled;
-            IsPauseEnabled = iApp.PlayerState == ITPlayerState.ITPlayerStatePlaying;
+            IsPauseEnabled = App.Current.iApp.PlayerState == ITPlayerState.ITPlayerStatePlaying;
             IsPlayEnabled = !IsPauseEnabled;
             IsStopEnabled = IsPauseEnabled;
         }
@@ -113,24 +101,44 @@ namespace MusicArt.ViewModels
 
         private void ConnectToItunes()
         {
-            iApp = new();
+            App.Current.iApp = new();
             IsItunesClosed = false;
-            iApp.OnPlayerPlayEvent += iApp_PlayerPlaying;
-            iApp.OnPlayerStopEvent += iApp_PlayerStopped;
-            iApp.OnQuittingEvent += iApp_iTunesQuitting;
-            iApp.OnAboutToPromptUserToQuitEvent += iApp_AboutToPromptUserToQuit;
-            iApp.OnSoundVolumeChangedEvent += iApp_SoundVolumeChanged;
+            App.Current.iApp.OnPlayerPlayEvent += iApp_PlayerPlaying;
+            App.Current.iApp.OnPlayerStopEvent += iApp_PlayerStopped;
+            App.Current.iApp.OnQuittingEvent += iApp_iTunesQuitting;
+            App.Current.iApp.OnAboutToPromptUserToQuitEvent += iApp_AboutToPromptUserToQuit;
+            App.Current.iApp.OnSoundVolumeChangedEvent += iApp_SoundVolumeChanged;
             UpdateTrackAndPlayerState();
             updateProgressTimer = new((e) => UpdateProgress(), null, TimeSpan.Zero, TimeSpan.FromSeconds(0.5));
         }
 
+        public void DisconnectFromItunes()
+        {
+            updateProgressTimer.Change(Timeout.Infinite, Timeout.Infinite);
+            updateProgressTimer?.Dispose();
+            App.Current.iApp.OnPlayerPlayEvent -= iApp_PlayerPlaying;
+            App.Current.iApp.OnPlayerStopEvent -= iApp_PlayerStopped;
+            App.Current.iApp.OnPlayerPlayingTrackChangedEvent -= iApp_PlayingTrackInfoChanged;
+            App.Current.iApp.OnQuittingEvent -= iApp_iTunesQuitting;
+            App.Current.iApp.OnAboutToPromptUserToQuitEvent -= iApp_AboutToPromptUserToQuit;
+            App.Current.iApp.OnSoundVolumeChangedEvent -= iApp_SoundVolumeChanged;
+            System.Runtime.InteropServices.Marshal.FinalReleaseComObject(App.Current.iApp);
+            App.Current.iApp = null;
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            IsItunesClosed = true;
+        }
+
         private void UpdateProgress()
         {
-            if (iApp.CurrentTrack == null || Track == null || Track.Duration == 0) ProgressState = TaskbarItemProgressState.None;
+            if (App.Current.iApp.CurrentTrack == null || Track == null || Track.Duration == 0)
+                ProgressState = TaskbarItemProgressState.None;
             else
             {
-                ProgressValue = (double)(iApp.PlayerPosition / (decimal)Track.Duration);
-                switch (iApp?.PlayerState)
+                ProgressValue = (double)(App.Current.iApp.PlayerPosition / (decimal)Track.Duration);
+                switch (App.Current.iApp?.PlayerState)
                 {
                     case ITPlayerState.ITPlayerStatePlaying:
                         ProgressState = TaskbarItemProgressState.Normal;
@@ -142,13 +150,18 @@ namespace MusicArt.ViewModels
             }
         }
 
-        private void ShowTrackInItunes()
+        private static void ShowTrackInItunes()
         {
-            if (iApp.CurrentTrack is IITFileOrCDTrack iitf) iitf.Reveal();
+            if (App.Current.iApp.CurrentTrack is IITFileOrCDTrack iitf) iitf.Reveal();
         }
 
-        private void OpenTrackFolder() => Process.Start("explorer.exe",
-            string.Format(@"""{0}""", System.IO.Path.GetDirectoryName(Track.Location)));
+        private void OpenTrackFolder()
+        {
+            string argument = "/select, \"" + Track.Location + "\"";
+            Process.Start("explorer.exe", argument);
+        }
+
+        //string.Format(@"""{0}""", System.IO.Path.GetDirectoryName(Track.Location)));
 
         #region Commands
 
@@ -157,13 +170,13 @@ namespace MusicArt.ViewModels
             Clipboard.SetText(Track?.Artist + " " + Track?.Album));
 
         private RelayCommand nextTrackCommand;
-        public RelayCommand NextTrackCommand => nextTrackCommand ??= new(() => iApp.NextTrack());
+        public RelayCommand NextTrackCommand => nextTrackCommand ??= new(() => App.Current.iApp.NextTrack());
 
         private RelayCommand playPauseCommand;
-        public RelayCommand PlayPauseCommand => playPauseCommand ??= new(() => iApp.PlayPause());
+        public RelayCommand PlayPauseCommand => playPauseCommand ??= new(() => App.Current.iApp.PlayPause());
 
         private RelayCommand previousTrackCommand;
-        public RelayCommand PreviousTrackCommand => previousTrackCommand ??= new(() => iApp.PreviousTrack());
+        public RelayCommand PreviousTrackCommand => previousTrackCommand ??= new(() => App.Current.iApp.PreviousTrack());
 
         private RelayCommand startItunesCommand;
         public RelayCommand StartItunesCommand => startItunesCommand ??= new(() => ConnectToItunes());

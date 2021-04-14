@@ -8,8 +8,20 @@ using System.Windows.Media.Imaging;
 
 namespace MusicArt.ViewModels
 {
-    public class Track
+    public class Track : BindableModelBase
     {
+        // Fields
+        private string title;
+        private string artist;
+        private string album;
+        private int duration;
+        private string location;
+        private string lyrics;
+        private ImageSource coverArtImageSource;
+        private int coverArtMaxWidth;
+        private double coverArtWidth;
+
+        // Constructors
         public Track() { }
         public Track(IITTrack track)
         {
@@ -25,24 +37,43 @@ namespace MusicArt.ViewModels
             }
         }
 
-        public Track(ImageSource coverArt)
+        public Track(ImageSource coverArt, int maxWidth)
         {
             CoverArtImageSource = coverArt;
-            CoverArtMaxWidth = 400;
+            CoverArtMaxWidth = maxWidth;
         }
 
-        public string Title { get; set; }
-        public string Artist { get; set; }
-        public string Album { get; set; }
-        public int Duration { get; set; }
-        public string Location { get; set; }
-        public string Lyrics { get; set; }
-        public ImageSource CoverArtImageSource { get; set; }
-        public int CoverArtMaxWidth { get; set; }
+        // Properties
+        public string Title { get => title; set => SetProperty(ref title, value); }
+        public string Artist { get => artist; set => SetProperty(ref artist, value); }
+        public string Album { get => album; set => SetProperty(ref album, value); }
+        public int Duration { get => duration; set => SetProperty(ref duration, value); }
+        public string Location { get => location; set => SetProperty(ref location, value); }
+        public string Lyrics { get => lyrics; set => SetProperty(ref lyrics, value); }
+        public ImageSource CoverArtImageSource { get => coverArtImageSource; set => SetProperty(ref coverArtImageSource, value); }
+        public int CoverArtMaxWidth { get => coverArtMaxWidth; set => SetProperty(ref coverArtMaxWidth, value); }
+        public double CoverArtWidth { get => coverArtWidth; set => SetProperty(ref coverArtWidth, value); }
 
+        // Readonly Properties
         public string ArtistAlbum => Artist + (string.IsNullOrEmpty(Album) ? null : " — " + Album);
         public string TitleArtist => Title + " by " + Artist;
 
+        // Public Methods
+        public static ImageSource ImageSourceFromPath(string path)
+        {
+            BitmapImage bmp = new();
+            bmp.BeginInit();
+            // Caches image into memory, so file isn't locked.
+            bmp.CacheOption = BitmapCacheOption.OnLoad;
+            // Loads image without using an existing image cache. In case image was changed, new image will be loaded.
+            bmp.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+            bmp.UriSource = new Uri(path);
+            bmp.EndInit();
+            bmp.Freeze();
+            return bmp;
+        }
+
+        // Private Methods
         private void SetCoverArt(IITFileOrCDTrack track)
         {
             string coverPath = null;
@@ -67,6 +98,8 @@ namespace MusicArt.ViewModels
                     {
                         CoverArtImageSource = (ImageSource)new ImageSourceConverter().ConvertFrom(firstPicture.Data.Data);
                         CoverArtMaxWidth = (int)CoverArtImageSource.Width;
+                        // Hack to set Taskbar Thumbnail
+                        ResizeCoverArt();
                         return;
                     }
                 }
@@ -89,20 +122,16 @@ namespace MusicArt.ViewModels
                 CoverArtImageSource = (ImageSource)Application.Current.FindResource("Notes");
                 CoverArtMaxWidth = 200;
             }
+            // Hack to set Taskbar Thumbnail
+            ResizeCoverArt();
         }
 
-        public static ImageSource ImageSourceFromPath(string path)
+        // Hack to set Taskbar Thumbnail
+        private void ResizeCoverArt()
         {
-            BitmapImage bmp = new();
-            bmp.BeginInit();
-            // Caches image into memory, so file isn't locked.
-            bmp.CacheOption = BitmapCacheOption.OnLoad;
-            // Loads image without using an existing image cache. In case image was changed, new image will be loaded.
-            bmp.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-            bmp.UriSource = new Uri(path);
-            bmp.EndInit();
-            bmp.Freeze();
-            return bmp;
+            CoverArtWidth = 100d;
+            CoverArtWidth = double.NaN;
         }
+
     }
 }
