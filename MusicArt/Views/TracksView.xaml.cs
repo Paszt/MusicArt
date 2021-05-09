@@ -52,9 +52,14 @@ namespace MusicArt.Views
 
         private void TrackGrid_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.ClickCount >= 2)
-                if (sender is Grid grid && grid.Tag is TrackViewModel tvm && tvm.IITTrackReference is IITFileOrCDTrack file)
-                    file.Reveal();
+            try
+            {
+                if (e.ClickCount >= 2)
+                    if (sender is Grid grid && grid.Tag is TrackViewModel tvm && tvm.IITTrackReference is IITFileOrCDTrack file)
+                        file.Reveal();
+            }
+            catch (System.Exception) { }
+
         }
     }
 }

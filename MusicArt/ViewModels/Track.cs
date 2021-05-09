@@ -19,7 +19,7 @@ namespace MusicArt.ViewModels
         private string lyrics;
         private ImageSource coverArtImageSource;
         private int coverArtMaxWidth;
-        private double coverArtWidth;
+        private double coverArtWidth = double.NaN;
 
         // Constructors
         public Track() { }
@@ -41,6 +41,8 @@ namespace MusicArt.ViewModels
         {
             CoverArtImageSource = coverArt;
             CoverArtMaxWidth = maxWidth;
+            CoverArtWidth = double.NaN;
+            ResizeCoverArt();
         }
 
         // Properties
@@ -56,7 +58,9 @@ namespace MusicArt.ViewModels
 
         // Readonly Properties
         public string ArtistAlbum => Artist + (string.IsNullOrEmpty(Album) ? null : " — " + Album);
-        public string TitleArtist => Title + " by " + Artist;
+        public string TitleArtist => string.IsNullOrEmpty(Title) && string.IsNullOrEmpty(Artist) 
+            ? "MusicArt | No Track" 
+            : Title + " by " + Artist;
 
         // Public Methods
         public static ImageSource ImageSourceFromPath(string path)
@@ -83,8 +87,8 @@ namespace MusicArt.ViewModels
                             .Where(fileInfo => fileInfo.Extension == ".jpg" || fileInfo.Extension == ".png")
                             .Where(fileInfo =>
                                 Path.GetFileNameWithoutExtension(fileInfo.Name) == fileName ||
-                                Path.GetFileNameWithoutExtension(fileInfo.Name) == "cover" ||
-                                Path.GetFileNameWithoutExtension(fileInfo.Name) == "folder")
+                                Path.GetFileNameWithoutExtension(fileInfo.Name) == "folder" ||
+                                Path.GetFileNameWithoutExtension(fileInfo.Name) == "cover")
                             .FirstOrDefault();
             if (fi != null) coverPath = fi.FullName;
 

@@ -11,8 +11,10 @@
         MinHeight="450"
         Width="300"
         MinWidth="600"
-        Background="{DynamicResource Background}"
-        Closing="Window_Closing">
+        Background="{DynamicResource BackgroundDark}"
+        Style="{DynamicResource CustomWindowStyle}"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded">
     <!--<Window.DataContext>
         <viewModels:LibraryInfoViewModel />
     </Window.DataContext>-->

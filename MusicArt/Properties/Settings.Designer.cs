@@ -58,5 +58,17 @@ namespace MusicArt.Properties {
                 this["IsLeftColumnCollapsed"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ReportsWindowPlacement {
+            get {
+                return ((string)(this["ReportsWindowPlacement"]));
+            }
+            set {
+                this["ReportsWindowPlacement"] = value;
+            }
+        }
     }
 }

@@ -22,10 +22,16 @@ namespace MusicArt.Views
             Left = SystemParameters.WorkArea.Left;
             Width = SystemParameters.WorkArea.Width;
             Height = SystemParameters.WorkArea.Height;
-            UpdateTaskbarThumbnail();
             if (My.Settings.LeftColumnWidth == -1) My.Settings.LeftColumnWidth = LeftColumn.ActualWidth;
             LeftColumn.Width = My.Settings.IsLeftColumnCollapsed ? (new(0)) : (new(My.Settings.LeftColumnWidth));
             UpdateLeftColumnProps();
+            CoverArtImage.UpdateLayout();
+            UpdateTaskbarThumbnail();
+            if (DataContext is iTunesViewModel itvm)
+            {
+                itvm.ToggleFullscreen += ToggleFullscreen;
+                itvm.UpdateTaskbarThumbnail += UpdateTaskbarThumbnail;
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -33,7 +39,8 @@ namespace MusicArt.Views
             if (DataContext != null && DataContext is iTunesViewModel vm) vm.DisconnectFromItunes();
         }
 
-        private void CoverArtImage_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateTaskbarThumbnail();
+        private void CoverArtImage_SizeChanged(object sender, SizeChangedEventArgs e) =>
+            App.Current.Dispatcher.Invoke(UpdateTaskbarThumbnail);
 
         private void UpdateTaskbarThumbnail()
         {
@@ -141,10 +148,8 @@ namespace MusicArt.Views
                     TrackInfoGrid.BeginAnimation(OpacityProperty, new DoubleAnimation(0, TimeSpan.FromSeconds(0.2)));
                     break;
                 case Key.Right:
-                    if (LeftColumn.Width.Value != My.Settings.LeftColumnWidth) AnimateLeftColumn(ExpandCollapseState.Expanded);
-                    break;
                 case Key.Left:
-                    if (LeftColumn.Width.Value > 20) AnimateLeftColumn(ExpandCollapseState.Collapsed);
+                    AnimateLeftColumn();
                     break;
                 case Key.OemQuestion:
                     DoubleAnimation hideGridAnimation = new(0, TimeSpan.FromSeconds(0.2));
@@ -162,17 +167,16 @@ namespace MusicArt.Views
             UpdateLeftColumnProps();
         }
 
-        private void CollapseExpandLeftColButton_Click(object sender, RoutedEventArgs e)
-        {
-            ExpandCollapseState resultState = LeftColumn.Width.Value <= 20 ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed;
-            AnimateLeftColumn(resultState);
-        }
+        private void CollapseExpandLeftColButton_Click(object sender, RoutedEventArgs e) => AnimateLeftColumn();
 
-        private void AnimateLeftColumn(ExpandCollapseState resultState)
+        private void AnimateLeftColumn()
         {
+            ExpandCollapseState resultState = LeftColumn.Width.Value <= 20
+                ? ExpandCollapseState.Expanded
+                : ExpandCollapseState.Collapsed;
             Storyboard storyBoard = new Storyboard();
             double resultWidth = (resultState == ExpandCollapseState.Expanded) ? My.Settings.LeftColumnWidth : 0d;
-            GridLengthAnimation animation = new(resultWidth, TimeSpan.FromSeconds(0.2));
+            GridLengthAnimation animation = new(resultWidth, TimeSpan.FromSeconds(0.1));
             animation.Completed += delegate
             {
                 // Set the animation to null on completion. This allows the grid to be resized manually.
@@ -181,6 +185,8 @@ namespace MusicArt.Views
                 LeftColumn.Width = new GridLength(resultWidth);
                 // Update Settings and button properties to reflect new state.
                 UpdateLeftColumnProps();
+                // Update the taskbar thumbnail
+                UpdateTaskbarThumbnail();
             };
             storyBoard.Children.Add(animation);
             Storyboard.SetTarget(animation, LeftColumn);

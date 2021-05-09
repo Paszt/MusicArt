@@ -5,7 +5,7 @@ namespace MusicArt.ViewModels
     public class NoArtTracksViewModel : TracksViewModelBase
     {
         protected override bool ShouldAddTrack(IITTrack track) => TrackViewModel.IITrackHasFolderArt(track) == false;
-        protected override bool ShouldStopTrackIteration() => Tracks.Count > 200;
+        protected override bool ShouldStopTrackIteration() => FoundTracks.Count > 200;
         protected override bool TrackIsFixed(TrackViewModel track) => track.HasFolderArt == true;
 
         //protected override void GetTracks()

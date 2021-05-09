@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\Roboto-Regular.ttf" />
     <None Remove="Resources\SF-Pro-Text-Bold.otf" />
     <None Remove="Resources\SF-Pro-Text-Regular.otf" />
   </ItemGroup>
@@ -20,6 +19,9 @@
   <ItemGroup>
     <Reference Include="Interop.iTunesLib">
       <HintPath>Interop.iTunesLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Paszt.WPF">
+      <HintPath>Paszt.WPF.dll</HintPath>
     </Reference>
   </ItemGroup>
 

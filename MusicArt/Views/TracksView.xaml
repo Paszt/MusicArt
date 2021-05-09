@@ -11,21 +11,63 @@
              d:DataContext="{d:DesignInstance Type=viewModels:DeadTracksViewModel, IsDesignTimeCreatable=True}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
             <RowDefinition Height="Auto" />
+            <RowDefinition />
         </Grid.RowDefinitions>
+
+        <!-- Controls (Progress bar, checkbox, button)-->
+        <Grid Margin="20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox Height="32"
+                      Margin="0,20,0,20"
+                      ItemsSource="{Binding Playlists}"
+                      DisplayMemberPath="Name"
+                      SelectedValue="{Binding SelectedPlaylist}" />
+
+            <Button Content="Find"
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    Margin="10,0"
+                    Command="{Binding GetTracksCommand}" />
+
+            <!--ProgressBar-->
+            <Grid Visibility="{Binding IsBusy, Converter={StaticResource booleanToVisibilityConverter}}"
+                  Grid.Column="1"
+                  Margin="10,0"
+                  d:Margin="100,0,0,0">
+                <ProgressBar Value="{Binding TracksProgressValue}" />
+                <TextBlock HorizontalAlignment="Center"
+                           Grid.ColumnSpan="3"
+                           Grid.Row="1"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Foreground="White"
+                           Visibility="{Binding IsBusy, Converter={StaticResource booleanToVisibilityConverter}}" />
+            </Grid>
+
+            <CheckBox Content="Remove Fixed"
+                      IsChecked="{Binding RemoveTrackWhenFixed}"
+                      Grid.Column="2"
+                      VerticalAlignment="Center" />
+        </Grid>
 
         <!--Startup Content-->
         <ContentPresenter Content="{Binding StartContent, ElementName=TracksViewControl}"
+                          Grid.Row="1"
                           VerticalAlignment="Center"
                           HorizontalAlignment="Center" />
 
-        <!--Tracks Listbox-->
+        <!--Found Tracks Listbox-->
         <ListBox x:Name="TrackListBox"
+                 Grid.Row="1"
                  BorderBrush="Transparent"
-                 Background="{DynamicResource Background}"
+                 Background="{DynamicResource BackgroundDark}"
                  Foreground="{StaticResource Foreground}"
-                 ItemsSource="{Binding Tracks}"
+                 ItemsSource="{Binding FoundTracks}"
                  Grid.IsSharedSizeScope="True"
                  Visibility="{Binding IsTracksListVisible, Converter={StaticResource booleanToVisibilityConverter}}">
             <ListBox.ItemTemplate>
@@ -117,34 +159,9 @@
         <!--No Tracks found content-->
         <ContentPresenter Content="{Binding NoTracksFoundContent, ElementName=TracksViewControl}"
                           VerticalAlignment="Center"
+                          Grid.Row="1"
                           HorizontalAlignment="Center"
                           Visibility="{Binding WereNoTracksFound, Converter={StaticResource booleanToVisibilityConverter}}" />
-
-        <!--Bottom Controls (Progress bar, checkbox, button)-->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <ProgressBar Margin="20"
-                         Value="{Binding TracksProgressValue}"
-                         Visibility="{Binding IsBusy, Converter={StaticResource booleanToVisibilityConverter}}" />
-            <TextBlock HorizontalAlignment="Center"
-                       Text="{Binding StatusText}"
-                       VerticalAlignment="Center"
-                       Foreground="White"
-                       Visibility="{Binding IsBusy, Converter={StaticResource booleanToVisibilityConverter}}" />
-            <CheckBox Content="Remove Fixed"
-                      IsChecked="{Binding RemoveTrackWhenFixed}"
-                      Grid.Column="1"
-                      VerticalAlignment="Center" />
-            <Button Content="Find"
-                    Grid.Column="2"
-                    Margin="20"
-                    Command="{Binding GetTracksCommand}" />
-
-        </Grid>
 
     </Grid>
 </UserControl>

@@ -1,6 +1,7 @@
 ﻿using MusicArt.ViewModels;
 using System.Reflection;
 using System.Windows;
+using Paszt.WPF.Extensions;
 
 namespace MusicArt.Views
 {
@@ -27,10 +28,15 @@ namespace MusicArt.Views
 
         public LibraryInfoWindow() => InitializeComponent();
 
+        private void Window_Loaded(object sender, RoutedEventArgs e) => this.SetPlacement(My.Settings.ReportsWindowPlacement);
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            My.Settings.ReportsWindowPlacement = this.GetPlacement();
+            My.Settings.Save();
             ((TracksViewModelBase)NoArtTracksView.DataContext).Dispose();
             ((TracksViewModelBase)DeadTracksView.DataContext).Dispose();
         }
+
     }
 }

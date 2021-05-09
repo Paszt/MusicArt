@@ -10,9 +10,7 @@
         Height="450"
         Width="1000"
         Foreground="{StaticResource Foreground}"
-        Background="{StaticResource Background}"
-        ResizeMode="NoResize"
-        WindowStyle="None"
+        Background="{StaticResource BackgroundDark}"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         FontFamily="{DynamicResource SFPro}"
@@ -22,6 +20,10 @@
     <Window.DataContext>
         <viewModels:iTunesViewModel />
     </Window.DataContext>
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0"
+                      ResizeBorderThickness="0" />
+    </WindowChrome.WindowChrome>
     <Window.InputBindings>
         <KeyBinding Key="C"
                     Command="{Binding CopyArtistAlbumCommand}" />
@@ -112,17 +114,73 @@
                         </TabItem.Header>
                         <Grid>-->
                 <!--Lyrics-->
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                <ScrollViewer x:Name="LyricsScrollviewer"
+                              VerticalScrollBarVisibility="Auto"
                               Margin="0,10,0,0"
                               Grid.Row="2"
-                              Visibility="{Binding TrackHasLyrics, 
-                                                   Converter={StaticResource booleanToVisibilityConverter}}"
-                              d:Visibility="Visible">
+                              MinWidth="200"
+                              Visibility="{Binding TrackHasLyrics, Converter={StaticResource booleanToVisibilityConverter}}"
+                              d:Visibility="Hidden">
                     <TextBlock Text="{Binding Track.Lyrics }"
                                TextWrapping="WrapWithOverflow"
                                TextAlignment="Center"
                                Margin="0,0,32,0" />
                 </ScrollViewer>
+                <StackPanel Margin="0,10,10,0"
+                            Grid.Row="2"
+                            d:Visibility="Visible"
+                            Visibility="{Binding TrackDoesntHaveLyrics, Converter={StaticResource booleanToVisibilityConverter}}">
+                    <Button Margin="10"
+                            Command="{Binding GeniusSongSearch.GeniusSearchCommand}"
+                            CommandParameter="{Binding Track.TitleArtist}"
+                            Style="{DynamicResource ImageButton}"
+                            Visibility="{Binding GeniusSongSearch.SearchHasNotStarted, Converter={StaticResource booleanToVisibilityConverter}}"
+                            Focusable="False">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="6">
+                            <TextBlock Text="Search for lyrics"
+                                       Foreground="{DynamicResource Foreground}" />
+                            <Image Source="{DynamicResource Genius}"
+                                   Width="18"
+                                   Margin="10,0" />
+                        </StackPanel>
+                    </Button>
+                    <ListBox ItemsSource="{Binding GeniusSongSearch.SearchResults}"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="-5,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Image Source="{Binding SongArtImageThumbnailUri}"
+                                           Width="80" />
+                                    <TextBlock Grid.Column="1">
+                                        <Hyperlink Command="{Binding NavigateCommand}"
+                                                   CommandParameter="{Binding}">
+                                            <StackPanel Margin="5,0">
+                                                <TextBlock Text="{Binding Title}"
+                                                           TextWrapping="WrapWithOverflow"
+                                                           Margin="0,0,0,5" />
+                                                <TextBlock Text="{Binding PrimaryArtist.Name}"
+                                                           TextWrapping="WrapWithOverflow" />
+                                            </StackPanel>
+                                            <!--<TextBlock Text="{Binding FullTitle }"
+                                                       TextWrapping="WrapWithOverflow"
+                                                       Margin="5,0" />-->
+                                        </Hyperlink>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Text="No lyrics found"
+                               HorizontalAlignment="Center"
+                               d:Visibility="Visible"
+                               Margin="0,20,0,0"
+                               Visibility="{Binding GeniusSongSearch.NoSongsFound, Converter={StaticResource booleanToVisibilityConverter}}" />
+                </StackPanel>
                 <!--Lyrics Search-->
 
                 <!--</Grid>
@@ -170,15 +228,13 @@
                 </GridSplitter.Triggers>
             </GridSplitter>
             <!--Cover Art-->
-            <Grid x:Name="CoverArtContainer"
-                  Grid.Column="1">
-                <Image x:Name="CoverArtImage"
-                       Margin="30"
-                       Width="{Binding Track.CoverArtWidth}"
-                       MaxWidth="{Binding Track.CoverArtMaxWidth}"
-                       Source="{Binding Track.CoverArtImageSource}"
-                       SizeChanged="CoverArtImage_SizeChanged" />
-            </Grid>
+            <Image x:Name="CoverArtImage"
+                   Grid.Column="1"
+                   d:Source="https://images.rapgenius.com/cc80183e3c023a071b7bc1185ad02767.1000x1000x1.jpg"
+                   Width="{Binding Track.CoverArtWidth}"
+                   MaxWidth="{Binding Track.CoverArtMaxWidth}"
+                   Source="{Binding Track.CoverArtImageSource}"
+                   SizeChanged="CoverArtImage_SizeChanged" />
             <!--Track Info Over Cover Art-->
             <Grid x:Name="TrackInfoGrid"
                   Grid.Column="1"
@@ -207,13 +263,12 @@
             <!--Left column Control Button-->
             <Button x:Name="CollapseExpandLeftColButton"
                     Grid.Column="1"
-                    Margin="10"
-                    Width="30"
-                    Height="30"
+                    Width="40"
+                    Height="40"
                     VerticalAlignment="Top"
                     HorizontalAlignment="Left"
                     Click="CollapseExpandLeftColButton_Click"
-                    Style="{StaticResource ImageButton }"
+                    Style="{StaticResource ImageButton}"
                     Opacity="0"
                     d:Opacity="0.3"
                     Focusable="False">
@@ -254,7 +309,8 @@
                     </EventTrigger>
                 </Button.Triggers>
                 <Image x:Name="CollapseColImg"
-                       Source="{DynamicResource ArrowLeft}">
+                       Source="{DynamicResource ArrowLeft}"
+                       Margin="5">
                     <Image.RenderTransform>
                         <RotateTransform Angle="0"
                                          CenterX="13"
@@ -395,7 +451,8 @@
                    Height="60"
                    Width="150"
                    VerticalAlignment="Top"
-                   HorizontalAlignment="Right">
+                   HorizontalAlignment="Right"
+                   WindowChrome.IsHitTestVisibleInChrome="True">
             <Rectangle.Triggers>
                 <EventTrigger RoutedEvent="Rectangle.MouseEnter">
                     <BeginStoryboard>
@@ -427,7 +484,8 @@
                     Background="#010101"
                     Height="30"
                     Opacity="0"
-                    d:Opacity="1">
+                    d:Opacity="1"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
             <StackPanel.Triggers>
                 <EventTrigger RoutedEvent="Rectangle.MouseEnter">
                     <BeginStoryboard>
