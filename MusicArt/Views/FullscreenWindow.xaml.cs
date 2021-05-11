@@ -103,8 +103,12 @@ namespace MusicArt.Views
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.IsRepeat) return;
             switch (e.Key)
             {
+                case Key.Escape:
+                    ToggleFullscreen();
+                    break;
                 case Key.I:
                     TrackInfoGrid.BeginAnimation(OpacityProperty,
                         new DoubleAnimation(0.7, TimeSpan.FromSeconds(0.2)));
@@ -127,9 +131,6 @@ namespace MusicArt.Views
         {
             switch (e.Key)
             {
-                case Key.Escape:
-                    ToggleFullscreen();
-                    break;
                 case Key.C:
                 case Key.R:
                     DoubleAnimationUsingKeyFrames flashAnimation = new()
