@@ -1,6 +1,7 @@
 ﻿<Window x:Class="MusicArt.Views.FullscreenWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Paszt.WPF.Controls;assembly=Paszt.WPF"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:resources="clr-namespace:MusicArt.Resources"
@@ -20,6 +21,8 @@
     <Window.DataContext>
         <viewModels:iTunesViewModel />
     </Window.DataContext>
+    <!-- The only thing this WindowChrome is used for is to make the Taskbar Icon minimize the app when clicked 
+         and the app is not already minimized.-->
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="0" />
@@ -29,8 +32,6 @@
                     Command="{Binding CopyArtistAlbumCommand}" />
         <KeyBinding Key="Space"
                     Command="{Binding PlayPauseCommand}" />
-        <!--<KeyBinding Gesture="Ctrl+F"
-                    Command="{Binding}" />-->
         <KeyBinding Key="O"
                     Command="{Binding ShowItunesCommand}" />
         <KeyBinding Key="F"
@@ -39,6 +40,8 @@
                     Command="{Binding RefreshTrackInfoCommand}" />
         <KeyBinding Gesture="Ctrl+F"
                     Command="{Binding ShowItunesOpenFolderCommand}" />
+        <KeyBinding Key="U"
+                    Command="{Binding ShowUpNextCommand}" />
     </Window.InputBindings>
     <Window.Resources>
         <Style TargetType="{x:Type TextBlock}">
@@ -80,7 +83,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <!--Information-->
+            <!-- Information, Left Column -->
             <Grid Margin="20,30,10,30">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -318,6 +321,19 @@
                     </Image.RenderTransform>
                 </Image>
             </Button>
+            <!--Track Progress Bar-->
+            <c:SmoothProgressBar x:Name="TrackProgress"
+                                 Opacity="0"
+                                 d:Opacity="1"
+                                 Grid.Column="1"
+                                 VerticalAlignment="Bottom"
+                                 Height="10"
+                                 BarColor="{StaticResource ProgressBrush}"
+                                 Background="Transparent"
+                                 d:Maximum="100"
+                                 d:DesiredValue="40"
+                                 DesiredValue="{Binding DesiredProgressValue}"
+                                 Maximum="1" />
         </Grid>
 
         <!--Not Connected-->
@@ -341,9 +357,9 @@
         <!--Keyboard Shortcut Guide-->
         <Grid x:Name="ShortcutGuideGrid"
               Opacity="0"
-              d:Opacity="0"
+              d:Opacity="1"
               Visibility="Collapsed"
-              d:Visibility="Collapsed"
+              d:Visibility="Visible"
               Background="#AA010101"
               Margin="10,0,-10,0">
             <Grid VerticalAlignment="Center"
@@ -355,7 +371,7 @@
                         <Setter Property="HorizontalAlignment"
                                 Value="Left" />
                         <Setter Property="Margin"
-                                Value="10,0,0,0" />
+                                Value="10,0" />
                         <Setter Property="Foreground"
                                 Value="Silver" />
                     </Style>
@@ -375,15 +391,20 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <resources:InputKey />
-                <TextBlock Text="Toggle Fullscreen"
+                <StackPanel Orientation="Horizontal">
+                    <resources:InputKey />
+                    <TextBlock Text="or" />
+                    <resources:InputKey  Text="F11"/>
+                </StackPanel>
+                <TextBlock Text="Toggle fullscreen"
                            Grid.Column="1" />
 
                 <resources:InputKey Text="F"
                                     Grid.Row="1" />
-                <TextBlock Text="Open track folder"
+                <TextBlock Text="Show track in File Explorer folder"
                            Grid.Column="1"
                            Grid.Row="1" />
 
@@ -395,7 +416,7 @@
 
                 <resources:InputKey Text="O"
                                     Grid.Row="3" />
-                <TextBlock Text="Show current song in iTunes"
+                <TextBlock Text="Show current track in iTunes"
                            Grid.Column="1"
                            Grid.Row="3" />
 
@@ -432,9 +453,15 @@
 
                 <resources:InputKey Text="M"
                                     Grid.Row="9" />
-                <TextBlock Text="Minimize Window"
+                <TextBlock Text="Minimize window"
                            Grid.Column="1"
                            Grid.Row="9" />
+
+                <resources:InputKey Text="P"
+                                    Grid.Row="10" />
+                <TextBlock Text="Toggle track progress visibility"
+                           Grid.Column="1"
+                           Grid.Row="10" />
             </Grid>
         </Grid>
 
@@ -522,16 +549,6 @@
                 <Image x:Name="RestoreImage"
                        Source="{DynamicResource Fullscreen}"
                        Margin="4" />
-                <!--<Grid Width="12"
-                      Height="12">
-                    <Rectangle StrokeThickness="1"
-                               Stroke="{StaticResource ControlGlythColor}"
-                               Margin="3,0,0,3" />
-                    <Rectangle StrokeThickness="1"
-                               Fill="#FF343434"
-                               Stroke="{StaticResource ControlGlythColor}"
-                               Margin="0 3 3 0" />
-                </Grid>-->
             </Button>
             <Button x:Name="CloseButton"
                     Background="Transparent"
@@ -546,16 +563,15 @@
                           X2="11"
                           Y2="11"
                           Stroke="{StaticResource ControlGlythColor}"
-                          StrokeThickness="1" />
+                          StrokeThickness="1.6" />
                     <Line X1="0"
                           Y2="0"
                           Y1="11"
                           X2="11"
                           Stroke="{StaticResource ControlGlythColor}"
-                          StrokeThickness="1" />
+                          StrokeThickness="1.6" />
                 </Grid>
             </Button>
         </StackPanel>
-
     </Grid>
 </Window>

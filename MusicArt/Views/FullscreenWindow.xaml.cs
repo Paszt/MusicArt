@@ -40,7 +40,7 @@ namespace MusicArt.Views
         }
 
         private void CoverArtImage_SizeChanged(object sender, SizeChangedEventArgs e) =>
-            App.Current.Dispatcher.Invoke(UpdateTaskbarThumbnail);
+            App.Current.Dispatcher.Invoke(() => UpdateTaskbarThumbnail());
 
         private void UpdateTaskbarThumbnail()
         {
@@ -107,6 +107,7 @@ namespace MusicArt.Views
             switch (e.Key)
             {
                 case Key.Escape:
+                case Key.F11:
                     ToggleFullscreen();
                     break;
                 case Key.I:
@@ -118,6 +119,11 @@ namespace MusicArt.Views
                     break;
                 case Key.M:
                     WindowState = WindowState.Minimized;
+                    break;
+                case Key.P:
+                    double toValue = TrackProgress.Opacity > 0 ? 0d : 1d;
+                    TrackProgress.BeginAnimation(OpacityProperty,
+                        new DoubleAnimation(toValue, TimeSpan.FromSeconds(0.2)));
                     break;
                 case Key.OemQuestion:
                     ShortcutGuideGrid.Visibility = Visibility.Visible;
@@ -141,7 +147,7 @@ namespace MusicArt.Views
                             new LinearDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.1)))
                         }
                     };
-                    flashAnimation.Completed += (object sender, EventArgs e) => OverlayGrid.Visibility = Visibility.Hidden;
+                    flashAnimation.Completed += (s, e) => OverlayGrid.Visibility = Visibility.Hidden;
                     OverlayGrid.Visibility = Visibility.Visible;
                     OverlayGrid.BeginAnimation(OpacityProperty, flashAnimation);
                     break;
@@ -150,6 +156,7 @@ namespace MusicArt.Views
                     break;
                 case Key.Right:
                 case Key.Left:
+                case Key.F12:
                     AnimateLeftColumn();
                     break;
                 case Key.OemQuestion:
@@ -175,7 +182,7 @@ namespace MusicArt.Views
             ExpandCollapseState resultState = LeftColumn.Width.Value <= 20
                 ? ExpandCollapseState.Expanded
                 : ExpandCollapseState.Collapsed;
-            Storyboard storyBoard = new Storyboard();
+            Storyboard storyBoard = new();
             double resultWidth = (resultState == ExpandCollapseState.Expanded) ? My.Settings.LeftColumnWidth : 0d;
             GridLengthAnimation animation = new(resultWidth, TimeSpan.FromSeconds(0.1));
             animation.Completed += delegate

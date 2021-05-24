@@ -15,6 +15,7 @@ namespace MusicArt.ViewModels
     public class iTunesViewModel : BindableModelBase
     {
         //private iTunesApp iApp;
+        private double desiredProgressValue;
         private bool isItunesClosed = true;
         private bool isNextEnabled;
         private bool isPauseEnabled;
@@ -85,6 +86,7 @@ namespace MusicArt.ViewModels
         public bool IsStopEnabled { get => isStopEnabled; set => SetProperty(ref isStopEnabled, value); }
         public bool IsItunesClosed { get => isItunesClosed; set => SetProperty(ref isItunesClosed, value); }
         public double ProgressValue { get => progressValue; set => SetProperty(ref progressValue, value); }
+        public double DesiredProgressValue { get => desiredProgressValue; set => SetProperty(ref desiredProgressValue, value); }
         public TaskbarItemProgressState ProgressState { get => progressState; set => SetProperty(ref progressState, value); }
         public Thickness ThumbnailClipMargin { get => thumbnailClipMargin; set => SetProperty(ref thumbnailClipMargin, value); }
         public GeniusSongSearchViewModel GeniusSongSearch { get => geniusSongSearch; set => SetProperty(ref geniusSongSearch, value); }
@@ -127,7 +129,7 @@ namespace MusicArt.ViewModels
         private void TrackChanged()
         {
             if (UpdateTaskbarThumbnail is not null)
-                App.Current.Dispatcher.Invoke(UpdateTaskbarThumbnail);
+                App.Current.Dispatcher.Invoke(() => UpdateTaskbarThumbnail());
             //UpdateTaskbarThumbnail?.Invoke();
             NotifyPropertyChanged(nameof(TrackHasLyrics));
             NotifyPropertyChanged(nameof(TrackDoesntHaveLyrics));
@@ -186,6 +188,7 @@ namespace MusicArt.ViewModels
             else
             {
                 ProgressValue = (double)(iApp.PlayerPosition / (decimal)Track.Duration);
+                DesiredProgressValue = (double)((iApp.PlayerPosition + 1) / (decimal)Track.Duration);
                 switch (iApp?.PlayerState)
                 {
                     case ITPlayerState.ITPlayerStatePlaying:
@@ -255,6 +258,16 @@ namespace MusicArt.ViewModels
 
         private RelayCommand toggleFullscreenCommand;
         public RelayCommand ToggleFullscreenCommand => toggleFullscreenCommand ??= new(() => ToggleFullscreen.Invoke());
+
+        private RelayCommand showUpNextCommand;
+        public RelayCommand ShowUpNextCommand => showUpNextCommand ??= new(() =>
+        {
+            IITPlaylist currentPlaylist = iApp.CurrentPlaylist;
+            foreach (IITTrack track in currentPlaylist.Tracks)
+            {
+                string album = track.Album;
+            }
+        });
 
         #endregion
 

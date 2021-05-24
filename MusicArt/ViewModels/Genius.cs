@@ -103,7 +103,7 @@ namespace MusicArt.ViewModels.Genius
         public RelayCommand<GeniusSearchResult> NavigateCommand => navigateCommand ??=
             new((GeniusSearchResult result) =>
             {
-                ProcessStartInfo psi = new ProcessStartInfo { FileName = Uri.ToString(), UseShellExecute = true };
+                ProcessStartInfo psi = new() { FileName = Uri.ToString(), UseShellExecute = true };
                 Process.Start(psi);
             });
     }
