@@ -70,5 +70,17 @@ namespace MusicArt.Properties {
                 this["ReportsWindowPlacement"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsProgressBarVisible {
+            get {
+                return ((bool)(this["IsProgressBarVisible"]));
+            }
+            set {
+                this["IsProgressBarVisible"] = value;
+            }
+        }
     }
 }

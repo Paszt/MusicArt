@@ -24,6 +24,7 @@ namespace MusicArt.Views
             Height = SystemParameters.WorkArea.Height;
             if (My.Settings.LeftColumnWidth == -1) My.Settings.LeftColumnWidth = LeftColumn.ActualWidth;
             LeftColumn.Width = My.Settings.IsLeftColumnCollapsed ? (new(0)) : (new(My.Settings.LeftColumnWidth));
+            if (My.Settings.IsProgressBarVisible) ToggleProgressOpacity();
             UpdateLeftColumnProps();
             CoverArtImage.UpdateLayout();
             UpdateTaskbarThumbnail();
@@ -121,9 +122,7 @@ namespace MusicArt.Views
                     WindowState = WindowState.Minimized;
                     break;
                 case Key.P:
-                    double toValue = TrackProgress.Opacity > 0 ? 0d : 1d;
-                    TrackProgress.BeginAnimation(OpacityProperty,
-                        new DoubleAnimation(toValue, TimeSpan.FromSeconds(0.2)));
+                    ToggleProgressOpacity();
                     break;
                 case Key.OemQuestion:
                     ShortcutGuideGrid.Visibility = Visibility.Visible;
@@ -200,6 +199,18 @@ namespace MusicArt.Views
             Storyboard.SetTarget(animation, LeftColumn);
             Storyboard.SetTargetProperty(animation, new PropertyPath(ColumnDefinition.WidthProperty));
             storyBoard.Begin();
+        }
+
+        private void ToggleProgressOpacity()
+        {
+            double toValue = TrackProgress.Opacity > 0 ? 0d : 1d;
+            DoubleAnimation progressOpacityAnimation = new(toValue, TimeSpan.FromSeconds(0.2));
+            progressOpacityAnimation.Completed += (s, e) =>
+            {
+                My.Settings.IsProgressBarVisible = TrackProgress.Opacity == 1;
+                My.Settings.Save();
+            };
+            TrackProgress.BeginAnimation(OpacityProperty,progressOpacityAnimation);
         }
 
         private void UpdateLeftColumnProps()
