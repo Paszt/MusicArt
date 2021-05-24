@@ -8,15 +8,16 @@ The order of cover art preference:
 3. **Embeded Art**: the first image embeded in the music file.  
 
 ### Keyboard Shortcuts
-| Key   | Function                                   |
-| ----- | ------------------------------------------ |
-| Esc   | Toggle fullscreen                          |
-| F     | Open track folder in Windows File Explorer |
-| I     | Hold to show track information             |
-| O     | Show current track in iTunes               |
-| R     | Refresh track information                  |
-| Space | Toggle Play / Pause                        |
-| →     | Show left column                           |
-| ←     | Hide left column                           |
-| ? /   | Hold to show keyboard shortcut guide       |
-| M     | Minimize window                            |
+| Key          | Function                                   |
+| ------------ | ------------------------------------------ |
+| Esc or F11   | Toggle fullscreen                          |
+| F            | Show track in File Explorer folder         |
+| I            | Hold to show track information             |
+| O            | Show current track in iTunes               |
+| R            | Refresh track information                  |
+| Space        | Toggle Play / Pause                        |
+| →            | Show left column                           |
+| ←            | Hide left column                           |
+| ? /          | Hold to show keyboard shortcut guide       |
+| M            | Minimize window                            |
+| P            | Toggle track progress visibility           |
