@@ -1,6 +1,8 @@
 ﻿using MusicArt.Resources;
 using MusicArt.ViewModels;
+using Paszt.WPF.Windows;
 using System;
+using System.Configuration;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,6 +16,8 @@ namespace MusicArt.Views
     /// </summary>
     public partial class FullscreenWindow : Window
     {
+        private iTunesViewModel ViewModel => (iTunesViewModel)DataContext;
+
         public FullscreenWindow() => InitializeComponent();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -28,30 +32,22 @@ namespace MusicArt.Views
             UpdateLeftColumnProps();
             CoverArtImage.UpdateLayout();
             UpdateTaskbarThumbnail();
-            if (DataContext is iTunesViewModel itvm)
-            {
-                itvm.ToggleFullscreen += ToggleFullscreen;
-                itvm.UpdateTaskbarThumbnail += UpdateTaskbarThumbnail;
-            }
+            ViewModel.ToggleFullscreen += ToggleFullscreen;
+            ViewModel.UpdateTaskbarThumbnail += UpdateTaskbarThumbnail;
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (DataContext != null && DataContext is iTunesViewModel vm) vm.DisconnectFromItunes();
-        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) => ViewModel.DisconnectFromItunes();
 
         private void CoverArtImage_SizeChanged(object sender, SizeChangedEventArgs e) =>
             App.Current.Dispatcher.Invoke(() => UpdateTaskbarThumbnail());
 
         private void UpdateTaskbarThumbnail()
         {
-            if (DataContext != null && DataContext is iTunesViewModel vm)
-            {
-                Point wpfPoint = CoverArtImage.TransformToAncestor(this).Transform(new Point(0, 0));
-                vm.ThumbnailClipMargin = new(wpfPoint.X, wpfPoint.Y,
-                    ActualWidth - CoverArtImage.ActualWidth - wpfPoint.X,
-                    ActualHeight - CoverArtImage.ActualHeight - wpfPoint.Y);
-            }
+
+            Point wpfPoint = CoverArtImage.TransformToAncestor(this).Transform(new Point(0, 0));
+            ViewModel.ThumbnailClipMargin = new(wpfPoint.X, wpfPoint.Y,
+                ActualWidth - CoverArtImage.ActualWidth - wpfPoint.X,
+                ActualHeight - CoverArtImage.ActualHeight - wpfPoint.Y);
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -71,15 +67,21 @@ namespace MusicArt.Views
                 {
                     Height = SystemParameters.PrimaryScreenHeight;
                     Top = 0;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("ExitFullscreen");
-                    RestoreButton.ToolTip = "Exit Fullscreen";
+                    ViewModel.ToggleFullscreenImageSource = (ImageSource)Application.Current.FindResource("ExitFullscreen");
+                    ViewModel.ToggleFullScreenImage.Source = ViewModel.ToggleFullscreenImageSource;
+                    //RestoreImage.Source = (ImageSource)Application.Current.FindResource("ExitFullscreen");
+                    //RestoreButton.ToolTip = "Exit Fullscreen (Esc or F11)";
+                    ViewModel.ToggleFullscreenText = "Exit Fullscreen (Esc or F11)";
                 }
                 else
                 {
                     Height = SystemParameters.WorkArea.Height;
                     Top = SystemParameters.WorkArea.Top;
-                    RestoreImage.Source = (ImageSource)Application.Current.FindResource("Fullscreen");
-                    RestoreButton.ToolTip = "Fullscreen";
+                    ViewModel.ToggleFullscreenImageSource = (ImageSource)Application.Current.FindResource("Fullscreen");
+                    ViewModel.ToggleFullScreenImage.Source = ViewModel.ToggleFullscreenImageSource;
+                    //RestoreImage.Source = (ImageSource)Application.Current.FindResource("Fullscreen");
+                    //RestoreButton.ToolTip = "Fullscreen (Esc or F11)";
+                    ViewModel.ToggleFullscreenText = "Fullscreen (Esc or F11)";
                 }
             }
             else
@@ -90,14 +92,14 @@ namespace MusicArt.Views
                     Width = SystemParameters.PrimaryScreenWidth;
                     Left = 0;
                     RestoreImage.Source = (ImageSource)Application.Current.FindResource("ExitFullscreen");
-                    RestoreButton.ToolTip = "Exit Fullscreen";
+                    RestoreButton.ToolTip = "Exit Fullscreen (Esc or F11)";
                 }
                 else
                 {
                     Width = SystemParameters.WorkArea.Width;
                     Left = SystemParameters.WorkArea.Left;
                     RestoreImage.Source = (ImageSource)Application.Current.FindResource("Fullscreen");
-                    RestoreButton.ToolTip = "Fullscreen";
+                    RestoreButton.ToolTip = "Fullscreen (Esc or F11)";
                 }
             }
         }
@@ -203,14 +205,16 @@ namespace MusicArt.Views
 
         private void ToggleProgressOpacity()
         {
-            double toValue = TrackProgress.Opacity > 0 ? 0d : 1d;
-            DoubleAnimation progressOpacityAnimation = new(toValue, TimeSpan.FromSeconds(0.2));
+            double toOpacityValue = TrackProgress.Opacity > 0 ? 0d : 1d;
+            DoubleAnimation progressOpacityAnimation = new(toOpacityValue, TimeSpan.FromSeconds(0.2));
             progressOpacityAnimation.Completed += (s, e) =>
             {
                 My.Settings.IsProgressBarVisible = TrackProgress.Opacity == 1;
                 My.Settings.Save();
+                if (TrackProgress.Opacity == 0) TrackProgress.Visibility = Visibility.Collapsed;
             };
-            TrackProgress.BeginAnimation(OpacityProperty,progressOpacityAnimation);
+            if (TrackProgress.Opacity == 0) TrackProgress.Visibility = Visibility.Visible;
+            TrackProgress.BeginAnimation(OpacityProperty, progressOpacityAnimation);
         }
 
         private void UpdateLeftColumnProps()
@@ -232,6 +236,13 @@ namespace MusicArt.Views
             if (CollapseColImg.RenderTransform is RotateTransform rotateTransform)
                 rotateTransform.BeginAnimation(RotateTransform.AngleProperty,
                     new DoubleAnimation(newAngle, new(TimeSpan.FromSeconds(.2))));
+        }
+
+        private void TrackProgress_Clicked(object sender, RoutedEventArgs e)
+        {
+            int duration = ViewModel.Track.Duration;
+            int newPlayerPosition = (int)(duration * ((ClickedWidthEventArgs)e).WidthPercent);
+            App.Current.iApp.PlayerPosition = newPlayerPosition;
         }
     }
 }

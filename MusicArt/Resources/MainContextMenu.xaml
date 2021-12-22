@@ -34,9 +34,10 @@
                   InputGestureText="F"
                   Command="{Binding OpenTrackFolderCommand}"
                   Icon="{DynamicResource FileExplorerImage}" />
-        <MenuItem Header="Toggle Fullscreen"
+        <MenuItem Header="{Binding ToggleFullscreenText}"
                   InputGestureText="Esc"
-                  Command="{Binding ToggleFullscreenCommand}" />
+                  Command="{Binding ToggleFullscreenCommand}"
+                  Icon="{Binding ToggleFullScreenImage}" />
     </ContextMenu>
 
 </ResourceDictionary>

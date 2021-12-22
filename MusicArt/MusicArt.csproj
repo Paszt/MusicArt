@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Cassette.ico</ApplicationIcon>
+    <AssemblyTitle>Music Art</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>

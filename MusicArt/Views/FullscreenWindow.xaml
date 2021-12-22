@@ -4,6 +4,7 @@
         xmlns:c="clr-namespace:Paszt.WPF.Controls;assembly=Paszt.WPF"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MusicArt"
         xmlns:resources="clr-namespace:MusicArt.Resources"
         xmlns:viewModels="clr-namespace:MusicArt.ViewModels"
         mc:Ignorable="d"
@@ -21,8 +22,7 @@
     <Window.DataContext>
         <viewModels:iTunesViewModel />
     </Window.DataContext>
-    <!-- The only thing this WindowChrome is used for is to make the Taskbar Icon minimize the app when clicked 
-         and the app is not already minimized.-->
+    <!-- The only thing this WindowChrome is used for is to make the Taskbar Icon minimize the app when clicked.-->
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="0" />
@@ -325,6 +325,8 @@
             <c:SmoothProgressBar x:Name="TrackProgress"
                                  Opacity="0"
                                  d:Opacity="1"
+                                 Visibility="Collapsed"
+                                 d:Visibility="Visible"
                                  Grid.Column="1"
                                  VerticalAlignment="Bottom"
                                  Height="10"
@@ -333,7 +335,10 @@
                                  d:Maximum="100"
                                  d:DesiredValue="40"
                                  DesiredValue="{Binding DesiredProgressValue}"
-                                 Maximum="1" />
+                                 Maximum="1"
+                                 ShowHoverBar="True"
+                                 HoverBarColor="{StaticResource ControlSelectedBackground}"
+                                 Clicked="TrackProgress_Clicked" />
         </Grid>
 
         <!--Not Connected-->
@@ -359,7 +364,7 @@
               Opacity="0"
               d:Opacity="1"
               Visibility="Collapsed"
-              d:Visibility="Visible"
+              d:Visibility="Collapsed"
               Background="#AA010101"
               Margin="10,0,-10,0">
             <Grid VerticalAlignment="Center"
@@ -397,7 +402,7 @@
                 <StackPanel Orientation="Horizontal">
                     <resources:InputKey />
                     <TextBlock Text="or" />
-                    <resources:InputKey  Text="F11"/>
+                    <resources:InputKey  Text="F11" />
                 </StackPanel>
                 <TextBlock Text="Toggle fullscreen"
                            Grid.Column="1" />
@@ -545,10 +550,12 @@
                     Width="40"
                     Focusable="False"
                     Click="RestoreButton_Click"
-                    ToolTip="Fullscreen">
+                    ToolTip="{Binding ToggleFullscreenText}">
+                <!--ToolTip="Fullscreen (Esc or F11)"-->
                 <Image x:Name="RestoreImage"
-                       Source="{DynamicResource Fullscreen}"
+                       Source="{Binding ToggleFullscreenImageSource}"
                        Margin="4" />
+                <!--{DynamicResource Fullscreen}-->
             </Button>
             <Button x:Name="CloseButton"
                     Background="Transparent"

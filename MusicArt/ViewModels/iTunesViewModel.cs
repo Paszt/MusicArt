@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shell;
@@ -14,7 +15,6 @@ namespace MusicArt.ViewModels
         Justification = "That's how it's spelled.")]
     public class iTunesViewModel : BindableModelBase
     {
-        //private iTunesApp iApp;
         private double desiredProgressValue;
         private bool isItunesClosed = true;
         private bool isNextEnabled;
@@ -26,15 +26,18 @@ namespace MusicArt.ViewModels
         private TaskbarItemProgressState progressState = TaskbarItemProgressState.None;
         private double progressValue;
         private Thickness thumbnailClipMargin;
+        private ImageSource toggleFullscreenImageSource = (ImageSource)Application.Current.FindResource("Fullscreen");
+        private Image toggleFullScreenImage = new();
+        private string toggleFullscreenText = "Fullscreen (Esc or F11)";
         private Timer updateProgressTimer;
         private iTunesApp iApp;
-        private GeniusSongSearchViewModel geniusSongSearch;
+        private GeniusSongSearchViewModel geniusSongSearch = new();
 
         public iTunesViewModel()
         {
+            ToggleFullScreenImage.Source = toggleFullscreenImageSource;
             if (App.GetIsInDesignMode())
             {
-                GeniusSongSearch = new();
                 Track = new()
                 {
                     Artist = "Bob Dylan",
@@ -70,7 +73,6 @@ namespace MusicArt.ViewModels
             }
             else
             {
-                GeniusSongSearch = new();
                 ConnectToItunes();
             }
         }
@@ -90,8 +92,10 @@ namespace MusicArt.ViewModels
         public TaskbarItemProgressState ProgressState { get => progressState; set => SetProperty(ref progressState, value); }
         public Thickness ThumbnailClipMargin { get => thumbnailClipMargin; set => SetProperty(ref thumbnailClipMargin, value); }
         public GeniusSongSearchViewModel GeniusSongSearch { get => geniusSongSearch; set => SetProperty(ref geniusSongSearch, value); }
-
         public Action ToggleFullscreen { get; set; }
+        public Image ToggleFullScreenImage { get => toggleFullScreenImage; set => SetProperty(ref toggleFullScreenImage, value); }
+        public ImageSource ToggleFullscreenImageSource { get => toggleFullscreenImageSource; set => SetProperty(ref toggleFullscreenImageSource, value); }
+        public string ToggleFullscreenText { get => toggleFullscreenText; set => SetProperty(ref toggleFullscreenText, value); }
         public Action UpdateTaskbarThumbnail { get; set; }
 
         public static void GetPlayerButtonsState(out bool previousEnabled,
@@ -111,7 +115,11 @@ namespace MusicArt.ViewModels
 
         private void iApp_PlayerPlaying(object iTrack) => UpdateTrackAndPlayerState();
 
-        private void iApp_PlayerStopped(object iTrack) => UpdateTrackAndPlayerState();
+        private void iApp_PlayerStopped(object iTrack)
+        {
+            UpdateTrackAndPlayerState();
+            DesiredProgressValue = 0.0000001;
+        }
 
         private void UpdateTrackAndPlayerState()
         {
@@ -184,7 +192,9 @@ namespace MusicArt.ViewModels
         private void UpdateProgress()
         {
             if (iApp.CurrentTrack == null || Track == null || Track.Duration == 0)
+            {
                 ProgressState = TaskbarItemProgressState.None;
+            }
             else
             {
                 ProgressValue = (double)(iApp.PlayerPosition / (decimal)Track.Duration);
